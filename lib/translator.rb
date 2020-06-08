@@ -1,29 +1,34 @@
-require "yaml"
+  
+require 'yaml'
+require 'pry'
+
 
 def load_library(file_path)
-  lib_data = YAML.load_file(file_path)
-  lib_hash = {"get_meaning" => {}, "get_emoticon" => {}}
-  lib_data.each do |meaning, emoticons|
-    lib_hash["get_meaning"][emoticons[1]] = meaning
-    lib_hash["get_emoticon"][emoticons[0]] = emoticons[1]
+  emoticons = YAML.load_file(file_path)
+  new_hash = {}
+
+  emoticons.each do |key,value|
+    new_hash[key] = {}
+    # binding.pry
+    new_hash[key][:english] = value[0]
+    new_hash[key][:japanese] = value[1]
   end
-  lib_hash
+  new_hash
 end
 
-def get_japanese_emoticon(file_path, english_emoticon)
-  lib_data = load_library(file_path)
-  if lib_data["get_emoticon"].include?(english_emoticon)
-    lib_data["get_emoticon"][english_emoticon]
-  else
-    "Sorry, that emoticon was not found"
+def get_japanese_emoticon(file_path, emoticon)
+  library = load_library(file_path)
+  emoticon = library.keys.find do |key|
+    library[key][:english] == emoticon
   end
+  emoticon ? library[emoticon][:japanese] : "Sorry, that emoticon was not found"
 end
 
-def get_english_meaning(file_path, japanese_emoticon)
-  lib_data = load_library(file_path)
-  if lib_data["get_meaning"].include?(japanese_emoticon)
-    lib_data["get_meaning"][japanese_emoticon]
-  else
-    "Sorry, that emoticon was not found"
+
+def get_english_meaning(file_path, emoticon)
+  library = load_library(file_path)
+  emoticon = library.keys.find do |key|
+    library[key][:japanese] == emoticon
   end
+  emoticon ? emoticon : "Sorry, that emoticon was not found"
 end
